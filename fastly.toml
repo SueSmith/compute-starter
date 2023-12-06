@@ -13,6 +13,6 @@ name = "Compute Starter with Glitch Origin"
   post_init = "npm install"
 
 [setup.backends."origin_0"] 
-  address = "impartial-small-conga.glitch.me"
+  address = "origin-website.glitch.me"
   description = "Glitch origin"
   port = 443
