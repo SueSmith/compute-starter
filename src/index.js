@@ -1,8 +1,7 @@
 /**
  * THIS COMPUTE CODE RUNS ON THE FASTLY EDGE 🚀
- * The functionality here runs at your edgecompute.app domain
- *
- * ⚠️ Make sure you publish again whenever you make a change here
+ * The functionality here runs at an edgecompute.app domain
+ * The app uses a default Glitch origin which you can remix if you like
  */
 
 // We're using expressly https://expressly.edgecompute.app
@@ -21,11 +20,9 @@ router.use(async (req, res) => {
   });
 });
 
-// CUSTOMIZATION BASED ON GEO
-// Return a style sheet based on the time of day
+// CUSTOMIZATION
+// Return a different stylesheet at the edge
 router.get("/origin.css", async (req, res) => {
-  // You can view the console output using fastly log-tail
-  console.info("Stylesheet request");
   // We're going to request a different url
   let url = new URL(req.url);
   // Switch out the stylesheet
@@ -41,7 +38,7 @@ router.get("/origin.css", async (req, res) => {
 });
 
 // SYNTHETIC CONTENT
-// If the request is for the json send it back in a page
+// If the request is for the json we send it back in a page
 router.get("/data.json", async (req, res) => {
   console.info("Data request");
   // Parse the JSON response from the origin
@@ -78,16 +75,16 @@ router.get("/data.json", async (req, res) => {
   res.withStatus(originResponse.status).html(page);
 });
 
-// Homepage
+// GEOLOCATION
+// Homepage displays an indicator of location 
 router.get("/", async (req, res) => {
-  let beresp = await fetch(req, { backend: "origin_0" });
-
+  let originRes = await fetch(req, { backend: "origin_0" });
   // Get the user location and country flag
   let geo = getGeolocationForIpAddress(req.ip);
   let where = geo.country_name + " " + getUnicodeFlagIcon(geo.country_code);
-  // Set the location in a cookie
+  // Set the location in a cookie – the page will parse and display it
   res.cookie("where", where);
-  res.send(beresp);
+  res.send(originRes);
 });
 
 // For anything other than the routes above, just return the origin response
